@@ -143,7 +143,7 @@ Custom Filament theme? Add the package views to your theme's `@source` list — 
 
 | Package | Filament | PHP |
 |---------|----------|-----|
-| 1.x | 4.x / 5.x | 8.2+ |
+| 1.x | 4.12+ / 5.x | 8.2+ |
 
 ## License
 

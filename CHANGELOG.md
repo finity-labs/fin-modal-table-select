@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.3] - 2026-10-04
+
+### Changed
+- Filament requirement raised from `^4.0` to `^4.12`. `standaloneRecords()` builds on the embedded-view `TableSelect` that Filament shipped in 4.12.0 (`toEmbeddedHtml()`, `Field::wrapEmbeddedHtml()`); on earlier 4.x the field fell back to the stock Blade view and mounted the relationship-based table, so the array-backed mode never ran. Composer now says so at install time instead of the field breaking quietly at runtime
+
 ## [1.1.2] - 2026-09-09
 
 ### Fixed

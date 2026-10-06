@@ -5,14 +5,17 @@ declare(strict_types=1);
 namespace FinityLabs\FinModalTableSelect\Tests\Fixtures\Livewire;
 
 use Closure;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Livewire\Component;
 
-class TestForm extends Component implements HasSchemas
+class TestForm extends Component implements HasActions, HasSchemas
 {
+    use InteractsWithActions;
     use InteractsWithSchemas;
 
     /** @var array<string, mixed>|null */
@@ -20,7 +23,8 @@ class TestForm extends Component implements HasSchemas
 
     public static ?Closure $makeComponents = null;
 
-    public static ?Model $record = null;
+    /** @var Model|array<string, mixed>|null */
+    public static Model|array|null $record = null;
 
     public function mount(): void
     {

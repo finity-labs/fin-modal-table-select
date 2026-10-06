@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Filament\Actions\Testing\TestAction;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Infolists\Components\RepeatableEntry\TableColumn;
@@ -11,6 +12,7 @@ use FinityLabs\FinModalTableSelect\Components\ModalTableSelect;
 use FinityLabs\FinModalTableSelect\Livewire\StandaloneRecordsTableSelectComponent;
 use FinityLabs\FinModalTableSelect\Tests\Fixtures\Livewire\TestForm;
 use FinityLabs\FinModalTableSelect\Tests\Fixtures\Tables\RoutesTable;
+use Illuminate\Database\Eloquent\Model;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 
@@ -28,10 +30,11 @@ function routeRecords(): array
     ];
 }
 
-function mountRecordsForm(callable $makeComponents): Testable
+/** @param  Model|array<string, mixed>|null  $record */
+function mountRecordsForm(callable $makeComponents, Model|array|null $record = null): Testable
 {
     TestForm::$makeComponents = Closure::fromCallable($makeComponents);
-    TestForm::$record = null;
+    TestForm::$record = $record;
 
     return Livewire::test(TestForm::class);
 }
@@ -97,6 +100,24 @@ it('passes the records payload through the field table arguments', function () {
     expect($arguments[StandaloneRecordsTableSelectComponent::RECORDS_ARGUMENT])
         ->toHaveCount(3)
         ->and($arguments[StandaloneRecordsTableSelectComponent::KEY_ATTRIBUTE_ARGUMENT])->toBe('key');
+});
+
+it('opens the select modal inside a schema whose record is an array row', function () {
+    // A record action on an array-backed table hands its modal schema the row
+    // as a plain array, and the field's getRecord() passes it along. The
+    // embedded Livewire component inherits a ?Model $record from Filament, so
+    // forwarding the array into the mount is a TypeError on the select click.
+    $livewire = mountRecordsForm(fn (): array => [
+        ModalTableSelect::make('routes')
+            ->tableConfiguration(RoutesTable::class)
+            ->standaloneRecords(fn (): array => routeRecords(), titleAttribute: 'label'),
+    ], record: ['__key' => 'users.index', 'key' => 'users.index', 'label' => 'Users']);
+
+    // Mounting renders the modal schema, which embeds the child component;
+    // before the guard this call died in the embedded Livewire mount.
+    $livewire
+        ->mountAction(TestAction::make('select')->schemaComponent('routes'))
+        ->assertActionMounted(TestAction::make('select')->schemaComponent('routes'));
 });
 
 it('hydrates a saved multiple selection into labels', function () {

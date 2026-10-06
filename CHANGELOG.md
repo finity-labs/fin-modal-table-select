@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2026-10-06
+
+### Fixed
+- Opening the picker from a record action on an array-backed table threw `Cannot assign array to property TableSelectLivewireComponent::$record of type ?Model` the moment either select trigger was clicked. On an array-backed table the action's schema record is the row itself as a plain array, and the embedded mount forwarded it into a property typed `?Model`. The mount now passes the record only when it's an Eloquent model — standalone mode never used it, since it only scopes relationship-based tables. Reported on PR #1 against fin-codex's coverage attach modal
+
 ## [1.1.3] - 2026-10-04
 
 ### Changed
